@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "GroceryItem" ALTER COLUMN "quantity" DROP NOT NULL,
+ALTER COLUMN "quantity" SET DEFAULT 0,
+ALTER COLUMN "priority" DROP NOT NULL,
+ALTER COLUMN "priority" SET DEFAULT 5;

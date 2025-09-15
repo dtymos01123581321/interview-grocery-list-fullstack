@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum GroceryItemStatus {
+  RANOUT
+  HAVE
+}
+
+model User {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email    String @unique
+  password String?
+
+  createdAt DateTime  @default(now()) @db.Timestamptz()
+  updatedAt DateTime  @updatedAt @db.Timestamptz()
+}
+
+model GroceryItem {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  quantity  Int?                @default(0)
+  priority  Int?                @default(5)
+  status    GroceryItemStatus   @default(RANOUT)
+  createdAt DateTime            @default(now()) @db.Timestamptz()
+  updatedAt DateTime            @updatedAt @db.Timestamptz()
+
+  history   GroceryItemHistory[]
+}
+
+model GroceryItemHistory {
+  id        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  groceryId String            @db.Uuid
+  grocery   GroceryItem       @relation(fields: [groceryId], references: [id])
+  oldStatus GroceryItemStatus?
+  newStatus GroceryItemStatus
+  changedAt DateTime          @default(now()) @db.Timestamptz()
+}
+
+
