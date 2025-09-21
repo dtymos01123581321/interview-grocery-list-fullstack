@@ -17,17 +17,26 @@ const api = ky.create({
   },
 })
 
-export const getGroceryList = async (params: { priority?: number; status?: string; perPage?: number }) => {
+export type GroceryStatus = 'HAVE' | 'WANT' | 'RANOUT'
+
+export interface ListParams {
+  priority?: number
+  sortBy?: 'name' | 'priority' | 'quantity'
+  status?: GroceryStatus
+  perPage?: number
+  order?: 'asc' | 'desc'
+}
+
+export const getGroceryList = async (params: ListParams) => {
   const searchParams = new URLSearchParams()
-  if (params.status) searchParams.append('status', params.status)
-  if (params.priority !== undefined) searchParams.append('priority', String(params.priority))
-  if (params.perPage !== undefined) searchParams.append('perPage', String(params.perPage))
+  if (params.status)   searchParams.set('status', params.status)
+  if (params.priority !== undefined) searchParams.set('priority', String(params.priority))
+  if (params.perPage !== undefined)  searchParams.set('perPage', String(params.perPage))
+  if (params.sortBy)   searchParams.set('sortBy', params.sortBy)
+  if (params.order)    searchParams.set('order', params.order)
 
-  const response = await api
-    .get('grocery', { searchParams })
-    .json<{ data: GroceryItem[] }>()
-
-  return response.data
+  const res = await api.get('grocery', { searchParams }).json<{ data: GroceryItem[] }>()
+  return res.data
 }
 
 export const createGroceryItem = async (groceryItem: GroceryFormItem) => {

@@ -17,15 +17,19 @@ import {
   MenuItem,
 } from '@mui/material'
 import { Delete } from '@mui/icons-material'
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material'
 
 import { useDeleteGrocery, useGroceryList, useUpdateGrocery } from 'hooks/useGrocery'
 
 const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
-  const [status, setStatus] = useState<string | undefined>(undefined)
+  const [status, setStatus] = useState<'HAVE' | 'WANT' | 'RANOUT' | undefined>(undefined)
   const [priority, setPriority] = useState<number | undefined>(undefined)
   const [perPage, setPerPage] = useState<number | undefined>(10)
 
-  const { data, isLoading, isError, error } = useGroceryList({ status, priority, perPage })
+  const [sortBy, setSortBy] = useState<'priority' | 'name' | 'quantity' | undefined>('priority')
+  const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+
+  const { data, isLoading, isError, error } = useGroceryList({ status, priority, perPage, sortBy, order })
   const updateGrocery = useUpdateGrocery()
   const deleteGrocery = useDeleteGrocery()
 
@@ -33,17 +37,11 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
   if (isError) return <div>Error: {error.message}</div>
 
   const handleQuantityChange = (id: string, newValue: number) => {
-    updateGrocery.mutate({
-      id,
-      data: { quantity: newValue },
-    })
+    updateGrocery.mutate({ id, data: { quantity: newValue } })
   }
 
   const handleStatusToggle = (id: string, currentStatus?: 'HAVE' | 'WANT') => {
-    updateGrocery.mutate({
-      id,
-      data: { status: currentStatus === 'HAVE' ? 'WANT' : 'HAVE' },
-    })
+    updateGrocery.mutate({ id, data: { status: currentStatus === 'HAVE' ? 'WANT' : 'HAVE' } })
   }
 
   const handleDelete = (id: string) => {
@@ -53,12 +51,13 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
   return (
     <Box>
       <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+        {/* Status */}
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Status</InputLabel>
           <Select
             value={status || ''}
             label="Status"
-            onChange={(e) => setStatus(e.target.value || undefined)}
+            onChange={(e) => setStatus((e.target.value || undefined) as 'HAVE' | 'WANT' | 'RANOUT' | undefined)}
           >
             <MenuItem value="">All</MenuItem>
             <MenuItem value="HAVE">Have</MenuItem>
@@ -67,6 +66,7 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
           </Select>
         </FormControl>
 
+        {/* Priority */}
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Priority</InputLabel>
           <Select
@@ -75,14 +75,13 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
             onChange={(e) => setPriority(Number(e.target.value) || undefined)}
           >
             <MenuItem value="">All</MenuItem>
-            <MenuItem value={1}>1</MenuItem>
-            <MenuItem value={2}>2</MenuItem>
-            <MenuItem value={3}>3</MenuItem>
-            <MenuItem value={4}>4</MenuItem>
-            <MenuItem value={5}>5</MenuItem>
+            {[1,2,3,4,5].map(p => (
+              <MenuItem key={p} value={p}>{p}</MenuItem>
+            ))}
           </Select>
         </FormControl>
 
+        {/* Per Page */}
         <FormControl size="small" sx={{ minWidth: 120 }}>
           <InputLabel>Per Page</InputLabel>
           <Select
@@ -90,20 +89,41 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
             label="Per Page"
             onChange={(e) => setPerPage(Number(e.target.value) || undefined)}
           >
-            <MenuItem value={5}>5</MenuItem>
-            <MenuItem value={10}>10</MenuItem>
-            <MenuItem value={20}>20</MenuItem>
+            {[5,10,20].map(p => (
+              <MenuItem key={p} value={p}>{p}</MenuItem>
+            ))}
           </Select>
         </FormControl>
       </Box>
 
+      {/* Table */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Status</TableCell>
+              {['name', 'quantity', 'status'].map((col) => (
+                <TableCell
+                  key={col}
+                  onClick={() => {
+                    if (sortBy === col) {
+                      setOrder(order === 'asc' ? 'desc' : 'asc')
+                    } else {
+                      setSortBy(col as 'priority' | 'name' | 'quantity')
+                      setOrder('asc')
+                    }
+                  }}
+                  style={{ cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  {col.charAt(0).toUpperCase() + col.slice(1)}
+                  {sortBy === col && (
+                    order === 'asc' ? (
+                      <ArrowUpward fontSize="small" />
+                    ) : (
+                      <ArrowDownward fontSize="small" />
+                    )
+                  )}
+                </TableCell>
+              ))}
               {isEditing && <TableCell>Action</TableCell>}
             </TableRow>
           </TableHead>

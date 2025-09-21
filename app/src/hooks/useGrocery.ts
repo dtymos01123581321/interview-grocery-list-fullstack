@@ -6,8 +6,14 @@ import { queryClient } from '@utils/client'
 import { GroceryFormItem, UpdateGroceryDto } from "../types/data";
 
 export const useGroceryList = (
-  params?: { priority?: number; status?: string; perPage?: number },
-  enabled = true
+  params?: {
+    priority?: number
+    sortBy?: 'priority' | 'name' | 'quantity'
+    status?: 'HAVE' | 'WANT' | 'RANOUT'
+    perPage?: number
+    order?: 'asc' | 'desc'
+  },
+  enabled: boolean = true
 ) => {
   return useQuery({
     queryKey: ['groceryList', params],
