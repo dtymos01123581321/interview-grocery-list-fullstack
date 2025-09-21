@@ -1,8 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 import { GroceryService } from './grocery.service'
 import { FilterGroceryDto } from './dto/filter.dto'
 import { CreateGroceryDto, GroceryItemIdDto, UpdateGroceryDto } from './dto/grocery.dto'
+import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 
+@UseGuards(JwtAuthGuard)
 @Controller({
   version: '1',
   path: 'grocery',
