@@ -1,25 +1,36 @@
-import { IsEnum, IsNumber, IsOptional } from 'class-validator'
-import { Transform } from 'class-transformer'
-
-import { GroceryItemStatus } from '@prisma/client'
+import { IsNumber, IsOptional, IsString } from 'class-validator'
+import { Type } from 'class-transformer'
 
 export class FilterGroceryDto {
-  @IsNumber()
-  @Transform(({ value }) => (value ? Number(value) : undefined))
   @IsOptional()
+  @IsString()
+  status?: 'HAVE' | 'WANT' | 'RANOUT'
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   priority?: number
 
-  @IsEnum(GroceryItemStatus)
   @IsOptional()
-  status?: GroceryItemStatus
-
+  @Type(() => Number)
   @IsNumber()
-  @Transform(({ value }) => (value ? Number(value) : undefined))
-  @IsOptional()
   skip?: number
 
-  @IsNumber()
-  @Transform(({ value }) => (value ? Number(value) : undefined))
   @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
   take?: number
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  perPage?: number
+
+  @IsOptional()
+  @IsString()
+  sortBy?: string
+
+  @IsOptional()
+  @IsString()
+  order?: 'asc' | 'desc'
 }

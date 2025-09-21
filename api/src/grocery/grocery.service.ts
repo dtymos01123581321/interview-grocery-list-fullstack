@@ -3,18 +3,23 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from 'src/prisma/prisma.service'
 import { FilterGroceryDto } from './dto/filter.dto'
 import { CreateGroceryDto, UpdateGroceryDto } from './dto/grocery.dto'
+import { GroceryItemStatus } from '@prisma/client'
 
 @Injectable()
 export class GroceryService {
   constructor(private readonly prisma: PrismaService) {}
 
   async filterGroceries(filter: FilterGroceryDto) {
-    const { skip, take, ...rest } = filter
+    const { skip, perPage, sortBy, order, status, ...rest } = filter
+
     return this.prisma.groceryItem.findMany({
-      where: rest,
-      orderBy: [{ priority: 'asc' }, { name: 'asc' }],
+      where: {
+        ...rest,
+        ...(status ? { status: status as GroceryItemStatus } : {}), // ✅ приводимо тип
+      },
+      orderBy: sortBy ? { [sortBy]: order || 'asc' } : [{ priority: 'asc' }, { name: 'asc' }],
       skip,
-      take,
+      take: perPage,
     })
   }
 

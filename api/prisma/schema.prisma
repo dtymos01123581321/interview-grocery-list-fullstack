@@ -14,8 +14,9 @@ datasource db {
 }
 
 enum GroceryItemStatus {
-  RANOUT
   HAVE
+  WANT
+  RANOUT
 }
 
 model User {

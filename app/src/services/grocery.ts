@@ -18,8 +18,14 @@ const api = ky.create({
 })
 
 export const getGroceryList = async (params: { priority?: number; status?: string; perPage?: number }) => {
-  const searchParams = new URLSearchParams(params as Record<string, string>)
-  const response = await api.get(`grocery`, { searchParams }).json<{ data: GroceryItem[] }>()
+  const searchParams = new URLSearchParams()
+  if (params.status) searchParams.append('status', params.status)
+  if (params.priority !== undefined) searchParams.append('priority', String(params.priority))
+  if (params.perPage !== undefined) searchParams.append('perPage', String(params.perPage))
+
+  const response = await api
+    .get('grocery', { searchParams })
+    .json<{ data: GroceryItem[] }>()
 
   return response.data
 }
