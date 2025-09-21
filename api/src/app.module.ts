@@ -6,6 +6,7 @@ import { AppService } from './app.service'
 import { UserModule } from './user/user.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { GroceryModule } from './grocery/grocery.module'
+import { AuthModule } from './auth/auth.module'
 import config from './config'
 
 @Module({
@@ -18,6 +19,7 @@ import config from './config'
       load: [config],
     }),
     GroceryModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
