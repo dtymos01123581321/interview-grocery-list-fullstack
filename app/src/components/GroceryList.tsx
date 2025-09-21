@@ -20,6 +20,8 @@ import { Delete } from '@mui/icons-material'
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material'
 
 import { useDeleteGrocery, useGroceryList, useUpdateGrocery } from 'hooks/useGrocery'
+import GroceryHistory from './GroceryHistory'
+import { History as HistoryIcon } from '@mui/icons-material'
 
 const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
   const [status, setStatus] = useState<'HAVE' | 'WANT' | 'RANOUT' | undefined>(undefined)
@@ -28,6 +30,8 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
 
   const [sortBy, setSortBy] = useState<'priority' | 'name' | 'quantity' | undefined>('priority')
   const [order, setOrder] = useState<'asc' | 'desc'>('asc')
+  const [openHistory, setOpenHistory] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const { data, isLoading, isError, error } = useGroceryList({ status, priority, perPage, sortBy, order })
   const updateGrocery = useUpdateGrocery()
@@ -46,6 +50,16 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
 
   const handleDelete = (id: string) => {
     deleteGrocery.mutate(id)
+  }
+
+  const handleOpenHistory = (id: string) => {
+    setSelectedId(id)
+    setOpenHistory(true)
+  }
+
+  const handleCloseHistory = () => {
+    setOpenHistory(false)
+    setSelectedId(null)
   }
 
   return (
@@ -125,6 +139,7 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
                 </TableCell>
               ))}
               {isEditing && <TableCell>Action</TableCell>}
+              <TableCell>History</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -156,11 +171,23 @@ const GroceryList: FC<{ isEditing?: boolean }> = ({ isEditing }) => {
                     </IconButton>
                   </TableCell>
                 )}
+                <TableCell>
+                  <IconButton onClick={() => handleOpenHistory(item.id)}>
+                    <HistoryIcon />
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      {selectedId && (
+        <GroceryHistory
+          id={selectedId}
+          open={openHistory}
+          onClose={handleCloseHistory}
+        />
+      )}
     </Box>
   )
 }

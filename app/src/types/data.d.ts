@@ -19,3 +19,10 @@ export interface UpdateGroceryDto {
   status?: 'HAVE' | 'WANT'
 }
 
+export interface GroceryHistoryItem {
+  id: string
+  groceryId: string
+  oldStatus?: 'HAVE' | 'WANT' | 'RANOUT'
+  newStatus: 'HAVE' | 'WANT' | 'RANOUT'
+  changedAt: string
+}

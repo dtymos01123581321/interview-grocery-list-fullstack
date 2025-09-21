@@ -1,7 +1,7 @@
 import ky from 'ky'
 
 import { env } from '@constants/env'
-import { GroceryFormItem, GroceryItem, UpdateGroceryDto } from '../types/data';
+import { GroceryFormItem, GroceryHistoryItem, GroceryItem, UpdateGroceryDto } from '../types/data';
 
 const api = ky.create({
   prefixUrl: env.API_URL,
@@ -52,5 +52,10 @@ export const updateGroceryItem = async (id: string, data: UpdateGroceryDto) => {
 
 export const deleteGroceryItem = async (id: string) => {
   const response = await api.delete(`grocery/${id}`).json<{ data: GroceryItem }>()
+  return response.data
+}
+
+export const getGroceryHistory = async (id: string) => {
+  const response = await api.get(`grocery/${id}/history`).json<{ data: GroceryHistoryItem[] }>()
   return response.data
 }

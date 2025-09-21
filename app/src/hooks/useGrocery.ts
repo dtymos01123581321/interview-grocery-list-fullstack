@@ -1,9 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { createGroceryItem, deleteGroceryItem, getGroceryList, updateGroceryItem } from '@services/grocery'
+import {
+  createGroceryItem,
+  deleteGroceryItem,
+  getGroceryHistory,
+  getGroceryList,
+  updateGroceryItem
+} from '@services/grocery'
 import { queryClient } from '@utils/client'
 
-import { GroceryFormItem, UpdateGroceryDto } from "../types/data";
+import { GroceryFormItem, GroceryHistoryItem, UpdateGroceryDto } from '../types/data';
 
 export const useGroceryList = (
   params?: {
@@ -51,5 +57,13 @@ export const useDeleteGrocery = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groceryList'] })
     },
+  })
+}
+
+export const useGroceryHistory = (id: string, enabled = true) => {
+  return useQuery<GroceryHistoryItem[]>({
+    queryKey: ['groceryHistory', id],
+    queryFn: () => getGroceryHistory(id),
+    enabled,
   })
 }
