@@ -11,10 +11,23 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  migrate:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: grocery-migrate
+    env_file:
+      - ./api/.env.test
+    depends_on:
+      grocery-db:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma migrate deploy"
 
   api:
     build:
@@ -26,10 +39,10 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - grocery-db
+      migrate:
+        condition: service_completed_successfully
     command: >
-      sh -c "npx prisma migrate deploy &&
-             node dist/main.js"
+      sh -c "node dist/main.js"
 
   app:
     build:
