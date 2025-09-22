@@ -6,7 +6,13 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
+# копіюємо код
 COPY . .
+
+# тут ключ — замінюємо .env.test → .env, щоб Vite бачив потрібні змінні
+COPY .env.test .env
+
+# білд фронта
 RUN npm run build
 
 # Stage 2: Nginx
