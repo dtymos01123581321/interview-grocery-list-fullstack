@@ -3,6 +3,7 @@ import { Logger, ValidationPipe, VersioningType } from '@nestjs/common'
 import { NestExpressApplication } from '@nestjs/platform-express'
 import { ConfigService } from '@nestjs/config'
 import { NextFunction, Request, Response } from 'express'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 import { AppModule } from './app.module'
 
@@ -13,6 +14,13 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     logger: process.env.NODE_ENV === 'development' ? ['debug', 'error', 'log', 'verbose', 'warn'] : ['error', 'warn'],
   })
+
+  const config = new DocumentBuilder()
+    .setTitle('Grocery API')
+    .setDescription('API документація для Grocery App')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build()
 
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }))
   app.enableVersioning({
@@ -35,6 +43,9 @@ async function bootstrap() {
     // allows the frontend to access the Authorization and Authorization-Refresh headers
     exposedHeaders: ['Authorization', 'Authorization-Refresh'],
   })
+
+  const document = SwaggerModule.createDocument(app, config)
+  SwaggerModule.setup('api/docs', app, document)
 
   await app.listen(apiPort, '0.0.0.0')
 
