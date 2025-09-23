@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { FilterGroceryDto } from './dto/filter.dto'
 import { CreateGroceryDto, UpdateGroceryDto } from './dto/grocery.dto'
 import { GroceryItemStatus } from '@prisma/client'
