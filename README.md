@@ -74,7 +74,7 @@ docker compose run --rm migrate
 
 ## Nice to haves
 - ✅ Authorization and authentication using JWT (already implemented).  
-- ⬜ Unit testing.  
+- ✅ Unit testing.  
 - ⬜ Integration testing.  
 - ⬜ End-to-end testing.  
 - ✅ Dockerizing both frontend and backend.  
